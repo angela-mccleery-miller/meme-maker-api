@@ -10,8 +10,12 @@ app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+CORS(app)
+
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
 class Meme(db.Model):
     __tablename__ = "memes"
     id = db.Column(db.Integer, primary_key=True)
@@ -46,9 +50,8 @@ def add_meme():
     meme = Meme.query.get(new_meme.id)
     return meme_schema.jsonify(meme)
 
-
+# PUT
 @app.route("/memes", methods=["GET"])
-
 def get_memes():
     all_memes = Meme.query.all()
     result = memes_schema.dump(all_memes)
@@ -63,7 +66,7 @@ def get_meme(id):
     return meme_schema.jsonify(meme)
     
     
-@app.route("/meme/<id>, methods=["PUT"])
+@app.route("/meme/<id>", methods=["PUT"])
 def update_meme(id):
 
     meme = Meme.query.get(id)
@@ -71,7 +74,7 @@ def update_meme(id):
     new_text = request.json["text"]
     new_favorite = request.json ["favorite"]
 
-meme.text = new_textmeme.favorite = new_favorite
+    meme.text = new_textmeme.favorite = new_favorite
 
     db.session.commit()
     return meme_schema.jsonify(new_meme)
